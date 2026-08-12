@@ -1,0 +1,213 @@
+---
+title: "new"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r}
+data <- read.csv("project_training set_p.csv")
+#feature selection
+library(Boruta)
+boruta <- Boruta(class ~ ., data = data, doTrace = 2, maxRuns = 1000)
+print(boruta)
+
+#get selected variables: 154 confirmed imp
+selected<-getSelectedAttributes(boruta, withTentative = F)
+print(selected)
+#exclude variable id
+xnam <- paste(selected[2:length(selected)], sep="")
+fmla <- as.formula(paste("class ~ ", paste(xnam, collapse= "+")))
+
+Training_data <- data[,c(selected,"class")]#include id
+```
+
+```{r}
+#mean, sd, median for each data
+library(psych)
+describe(data) #
+```
+
+
+
+```{r}
+Training_data$class = as.factor(Training_data$class)
+levels(Training_data$class)=c("Healthy","PD")
+Training_df = as.data.frame(Training_data)
+head(Training_data)
+dim(Training_data)#528,155
+```
+
+```{r}
+# Multiple Logistic Regression
+
+set.seed(1)
+cross_val_log = trainControl(method = "repeatedcv", number = 10, savePredictions = "all", classProbs = TRUE)
+model_log = train(class ~. -id, data = Training_data, method = "glm", family = "binomial", trControl = cross_val_log, metric = "Accuracy")
+
+print(model_log)
+```
+```{r}
+# Set K-Fold Cross-Validation at K= 10 for ROC
+cross_val_roc = trainControl(method = "repeatedcv", number = 10, savePredictions ="all", classProbs =TRUE, summaryFunction = twoClassSummary)
+set.seed(1)
+
+model_log_roc = train(class ~. -id , data = Training_data, method = "glm", family = "binomial", trControl = cross_val_roc, metric = "ROC")
+
+print(model_log_roc)
+```
+
+```{r}
+#QDA
+```
+
+```{r}
+#LASSO
+model_lasso = train(class ~. -id , data = Training_data, method = "glmnet", trControl = cross_val_log, tuneGrid = expand.grid(alpha = 1, lambda = 10^seq(-5,5, length = 100)), family = "binomial")
+print(model_lasso$results[model_lasso$results$lambda==unlist(model_lasso$bestTune),])
+
+#roc
+model_lasso_roc = train(class ~. -id , data = Training_data, method = "glmnet", trControl = cross_val_roc, tuneGrid = expand.grid(alpha = 1, lambda = 10^seq(-5,5, length = 100)), family = "binomial", metric = "ROC")
+
+print(model_lasso_roc$results[model_lasso_roc$results$ROC==max(model_lasso_roc$results$ROC),])
+```
+```{r}
+#knn
+set.seed(1)
+
+knn_model <- train(class ~. -id, data = Training_data, method = "knn", trControl = cross_val_log, preProcess = c("center","scale"), tuneLength = 20)
+
+print(knn_model$results[knn_model$results$k==unlist(knn_model$bestTune),])
+
+#k   Accuracy   Kappa    
+#   5  0.9018653  0.7257652
+```
+```{r}
+#ROC FOR KNN
+set.seed(1)
+
+model_knn_roc <- train(class ~. -id, data = Training_data, method = "knn", trControl = cross_val_roc, preProcess = c("center","scale"), tuneLength = 20, metric = "ROC")
+print(model_knn_roc$results[model_knn_roc$results$k==unlist(model_knn_roc$bestTune),])
+# k   ROC        Sens       Spec     
+#   5  0.9493880  0.7186813  0.9645513
+```
+```{r}
+#rf
+model_rf <- train(class ~. -id, data = Training_data, method = "rf",
+                  trControl = cross_val_log, tuneLength = 5)
+print(model_rf$results)#choose 39
+#ROC
+model_rf_roc = train(class ~. -id , data = Training_data, method = "rf", tuneLength = 5, trControl = cross_val_roc)
+print(model_rf_roc$results)
+```
+```{r}
+#mixed effect random forest
+Training_data_agg <- aggregate(. ~ id, data = Training_data, FUN = mean)
+Training_data_agg$class = as.factor(Training_data_agg$class)
+
+levels(Training_data_agg$class)=c("Healthy","PD")
+
+# Train the mixed effect random forest model
+model_rf_agg <- train(class ~.-id, data = Training_data_agg, method = "rf",
+                  trControl = cross_val_log, tuneLength = 5)
+print(model_rf_agg$results)#choose 39
+
+```
+```{r}
+#classification tree
+model_tree = train(class ~. -id , data = Training_data, method = "rpart", tuneLength = 30, trControl = cross_val_log)
+print(model_tree$results[model_tree$results$cp==unlist(model_tree$bestTune),])
+#ROC
+model_tree_roc = train(class ~. -id , data = Training_data, method = "rpart", tuneLength = 30, trControl = cross_val_roc)
+print(model_tree_roc$results[model_tree_roc$results$cp==unlist(model_tree_roc$bestTune),])
+```
+```{r}
+#SVM
+library(kernlab)
+SVM_model = train(class ~. -id , data = Training_data, method = "svmRadial", preProcess = c("center", "scale"), tuneLength = 20, trControl = cross_val_log)
+print(SVM_model$results[which.max(SVM_model$results$C),])
+#roc
+SVM_model_roc = train(class ~. -id , data = Training_data, method = "svmRadial", preProcess = c("center", "scale"), tuneLength = 20, trControl = cross_val_roc, metric = "ROC")
+print(SVM_model_roc$results[which.max(SVM_model_roc$results$C),])
+
+```
+
+```{r}
+#Neural Network
+library(neuralnet)
+maxs <- apply(Training_data[,!colnames(Training_data) %in% "class"], 2, max) 
+mins <- apply(Training_data[,!colnames(Training_data) %in% "class"], 2, min)
+scaled <- as.data.frame(scale(Training_data[,!colnames(Training_data) %in% "class"], center=mins, scale=maxs-mins))
+class <- Training_data$class
+Training_data2 = cbind(class, scaled)
+```
+
+```{r}
+model_neutral <- train(class ~. -id, data = Training_data2, method = "nnet", trControl = cross_val_log, trace = FALSE)
+print(model_neutral$results[model_neutral$results$size==unlist(model_neutral$bestTune),])
+nn_model <- neuralnet(class ~ . -id, data = Training_data, hidden = model_neutral$bestTune$size, act.fct = "logistic")
+# Plot neural network
+plot(nn_model)
+```
+
+
+
+```{r}
+model_neutral_roc = train(class ~. -id , data = Training_data2, method = "nnet", trControl = cross_val_roc, metric = "ROC")
+print(model_neutral_roc$results[model_neutral_roc$results$size==unlist(model_neutral_roc$bestTune),])
+
+nn_model <- neuralnet(class ~ . -id, data = Training_data, hidden = model$bestTune$size, act.fct = "logistic")
+# Plot neural network
+plot(nn_model)
+
+```
+
+```{r}
+# PLOT ROC Curve for the Models
+library(MLeval)
+plot_roc = evalm(list(model_log_roc, model_rf_roc, model_lasso_roc, SVM_model_roc, model_tree_roc, model_knn_roc,model_neutral_roc),gnames=c('Logistic', 'RF', 'Lasso',  'SVM', 'Tree', 'KNN',"Neural"))
+
+```
+```{r}
+
+```
+
+```{r}
+
+#repeated measure
+library(lme4)
+
+# Create a function to generate summary statistics for each individual
+aggregate_data <- function(data, id_var) {
+  # Calculate mean and standard deviation for each predictor variable for each individual
+  data_summary <- aggregate(. ~ get(id_var), data = data, 
+                            FUN = function(x) c(mean = mean(x), sd = sd(x)))
+  # Rename variables
+  names(data_summary)[-1] <- paste(names(data_summary)[-1], 
+                                   rep(c("_mean", "_sd"), 
+                                       each = ncol(data) - 1), sep = "")
+  # Merge the summary statistics back to the original data by id
+  data_merge <- merge(data, data_summary, by = id_var)
+  # Remove original variables
+  data_final <- data_merge[, !grepl(paste0("^", id_var, "$|_mean$|_sd$"), 
+                                    names(data_merge))]
+  # Return the final data set
+  return(data_final)
+}
+
+# Apply the aggregate function to create summary statistics for the training data
+Training_data_agg <- aggregate(. ~ id, data = Training_data, FUN = mean)
+
+# Remove id column
+Training_data_agg <- Training_data_agg[, -1]
+
+Training_data_agg$class = as.factor(Training_data_agg$class)
+levels(Training_data_agg$class)=c("Healthy","PD")
+# Train the SVM model with longitudinal data
+SVM_model_long <- train(class ~ ., data = Training_data_agg, method = "svmRadial", 
+                        preProcess = c("center", "scale"), tuneLength = 20, 
+                        trControl = cross_val_log, metric = "Accuracy")
+
+print(SVM_model_long$results[which.max(SVM_model_long$results$C),])
+```
