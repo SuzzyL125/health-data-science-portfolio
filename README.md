@@ -10,6 +10,7 @@ This repository brings together two graduate-coursework projects and presents th
 |---|---|---|
 | [Parkinson's disease classification from voice signals](machine-learning-parkinsons/) | High-dimensional binary classification, feature selection, cross-validation, ROC-AUC evaluation, repeated-measures considerations, clinical interpretation | R, caret, Boruta, glmnet, random forest, SVM, KNN |
 | [Data science computing](data-science-computing/) | Algorithm analysis, benchmarking, dynamic programming, concurrency, external sorting, multiprocessing, and GPU-computing concepts | Python, NumPy, threading, multiprocessing, PyOpenCL |
+| [Tableau healthcare analytics](tableau-projects/) | Hospital quality scorecards and county health-equity prioritization using official CMS and CDC data | Tableau, Python, CMS Care Compare, CDC PLACES |
 
 ## Why these projects matter for health data science
 

@@ -11,3 +11,7 @@ output/
 tmp/
 *.bin
 *.log
+tableau-projects/**/data/raw/*
+tableau-projects/**/data/processed/*.csv
+tableau-projects/**/data/processed/*.json
+!tableau-projects/**/data/raw/.gitkeep
