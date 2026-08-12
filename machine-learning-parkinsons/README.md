@@ -41,14 +41,14 @@ Boruta feature selection reduced 753 predictors to 154 confirmed features. Model
 
 ## What I contributed
 
-This was a team project. My coursework file focused on Boruta feature selection and comparison of logistic regression, LASSO, KNN, random forest, classification tree, radial SVM, neural networks, and participant-level aggregation. The original report and slides retain all contributors' names.
+This was a collaborative project. My coursework file focused on Boruta feature selection and comparison of logistic regression, LASSO, KNN, random forest, classification tree, radial SVM, neural networks, and participant-level aggregation. The public modeling report is anonymized for portfolio presentation.
 
 ## Files
 
 - `analysis/portfolio-analysis.R`: cleaned, portable analysis outline
 - `analysis/original-analysis.Rmd`: original submitted coursework analysis
 - `results/model-predictions.csv`: cleaned course test predictions
-- `reports/final-team-report.docx`: original team report
+- [`reports/modeling-report.md`](reports/modeling-report.md): public, privacy-cleaned report with narrative and result tables
 - `slides/final-team-presentation.pptx`: original team presentation
 
 ## Methodological lessons
