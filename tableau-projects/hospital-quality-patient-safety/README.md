@@ -67,6 +67,8 @@ Generated files:
 
 Then follow [the Tableau build guide](tableau/BUILD_GUIDE.md).
 
+Or open `tableau/hospital-quality-patient-safety.twb` directly in Tableau Desktop. It is connected to the processed CSV with a relative path and includes an editable executive dashboard with four views.
+
 ## Responsible interpretation
 
 CMS ratings are intended for comparison but depend on measure availability and reporting rules. A priority flag identifies facilities for further review; it does not prove poor care or establish causality. Missing measures must not be treated as average or favorable performance.

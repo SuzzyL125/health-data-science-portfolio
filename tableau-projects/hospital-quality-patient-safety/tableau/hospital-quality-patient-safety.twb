@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='utf-8'?>
+<workbook locale="en_US" source-platform="mac" version="18.1" source-build="2026.2.0 (20262.26.0710.0000)">
+  <preferences />
+  <style-theme name="smooth" />
+  <datasources>
+    <datasource caption="CMS Hospital Quality" inline="true" name="federated.portfolio" version="18.1">
+      <connection class="federated">
+        <named-connections>
+          <named-connection caption="CMS Hospital Quality" name="csv.connection">
+            <connection class="textscan" directory="../data/processed" filename="hospital_quality_tableau.csv" header="yes" separator="," text-qualifier="&amp;quot;" character-set="UTF-8" />
+          </named-connection>
+        </named-connections>
+        <relation connection="csv.connection" name="hospital_quality_tableau#csv" table="[hospital_quality_tableau#csv]" type="table">
+          <columns character-set="UTF-8" header="yes" locale="en_US" separator="," text-qualifier="&amp;quot;">
+            <column datatype="string" name="facility_id" ordinal="0" />
+            <column datatype="string" name="facility_name" ordinal="1" />
+            <column datatype="string" name="state" ordinal="2" />
+            <column datatype="string" name="hospital_type" ordinal="3" />
+            <column datatype="string" name="hospital_ownership" ordinal="4" />
+            <column datatype="real" name="hospital_overall_rating" ordinal="5" />
+            <column datatype="string" name="rating_label" ordinal="6" />
+            <column datatype="real" name="domain_worse_flags" ordinal="7" />
+            <column datatype="string" name="priority_tier" ordinal="8" />
+            <column datatype="real" name="four_five_star_flag" ordinal="9" />
+            <column datatype="real" name="mortality_worse_flag" ordinal="10" />
+            <column datatype="real" name="safety_worse_flag" ordinal="11" />
+            <column datatype="real" name="readmission_worse_flag" ordinal="12" />
+          </columns>
+        </relation>
+      </connection>
+      <column caption="Facility Id" datatype="string" name="[facility_id]" role="dimension" type="nominal" />
+      <column caption="Facility Name" datatype="string" name="[facility_name]" role="dimension" type="nominal" />
+      <column caption="State" datatype="string" name="[state]" role="dimension" type="nominal" />
+      <column caption="Hospital Type" datatype="string" name="[hospital_type]" role="dimension" type="nominal" />
+      <column caption="Hospital Ownership" datatype="string" name="[hospital_ownership]" role="dimension" type="nominal" />
+      <column caption="Hospital Overall Rating" datatype="real" name="[hospital_overall_rating]" role="measure" type="quantitative" />
+      <column caption="Rating Label" datatype="string" name="[rating_label]" role="dimension" type="nominal" />
+      <column caption="Domain Worse Flags" datatype="real" name="[domain_worse_flags]" role="measure" type="quantitative" />
+      <column caption="Priority Tier" datatype="string" name="[priority_tier]" role="dimension" type="nominal" />
+      <column caption="Four Five Star Flag" datatype="real" name="[four_five_star_flag]" role="measure" type="quantitative" />
+      <column caption="Mortality Worse Flag" datatype="real" name="[mortality_worse_flag]" role="measure" type="quantitative" />
+      <column caption="Safety Worse Flag" datatype="real" name="[safety_worse_flag]" role="measure" type="quantitative" />
+      <column caption="Readmission Worse Flag" datatype="real" name="[readmission_worse_flag]" role="measure" type="quantitative" />
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name="Rating by State">
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold="true" fontcolor="#203864" fontsize="13">Average Hospital Rating by State</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="CMS Hospital Quality" name="federated.portfolio" />
+          </datasources>
+          <datasource-dependencies datasource="federated.portfolio">
+            <column caption="State" datatype="string" name="[state]" role="dimension" type="nominal" />
+            <column-instance column="[state]" derivation="None" name="[none:state:nk]" pivot="key" type="nominal" />
+            <column caption="Hospital Overall Rating" datatype="real" name="[hospital_overall_rating]" role="measure" type="quantitative" aggregation="Avg" />
+            <column-instance column="[hospital_overall_rating]" derivation="Avg" name="[avg:hospital_overall_rating:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+            <encodings>
+              <color column="[federated.portfolio].[avg:hospital_overall_rating:qk]" />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.portfolio].[none:state:nk]</rows>
+        <cols>[federated.portfolio].[avg:hospital_overall_rating:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Priority Mix">
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold="true" fontcolor="#203864" fontsize="13">Hospitals by Priority Tier</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="CMS Hospital Quality" name="federated.portfolio" />
+          </datasources>
+          <datasource-dependencies datasource="federated.portfolio">
+            <column caption="Priority Tier" datatype="string" name="[priority_tier]" role="dimension" type="nominal" />
+            <column-instance column="[priority_tier]" derivation="None" name="[none:priority_tier:nk]" pivot="key" type="nominal" />
+            <column caption="Facility Id" datatype="string" name="[facility_id]" role="dimension" type="nominal" />
+            <column-instance column="[facility_id]" derivation="Count" name="[count:facility_id:nk]" pivot="key" type="nominal" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+            <encodings>
+              <color column="[federated.portfolio].[none:priority_tier:nk]" />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.portfolio].[none:priority_tier:nk]</rows>
+        <cols>[federated.portfolio].[count:facility_id:nk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Rating Distribution">
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold="true" fontcolor="#203864" fontsize="13">Hospitals by Overall Star Rating</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="CMS Hospital Quality" name="federated.portfolio" />
+          </datasources>
+          <datasource-dependencies datasource="federated.portfolio">
+            <column caption="Rating Label" datatype="string" name="[rating_label]" role="dimension" type="nominal" />
+            <column-instance column="[rating_label]" derivation="None" name="[none:rating_label:nk]" pivot="key" type="nominal" />
+            <column caption="Facility Id" datatype="string" name="[facility_id]" role="dimension" type="nominal" />
+            <column-instance column="[facility_id]" derivation="Count" name="[count:facility_id:nk]" pivot="key" type="nominal" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+            <encodings>
+              <color column="[federated.portfolio].[none:rating_label:nk]" />
+              <text column="[federated.portfolio].[count:facility_id:nk]" />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.portfolio].[count:facility_id:nk]</rows>
+        <cols>[federated.portfolio].[none:rating_label:nk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Risk Domain Summary">
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold="true" fontcolor="#203864" fontsize="13">Total Worse-than-National Domain Flags</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="CMS Hospital Quality" name="federated.portfolio" />
+          </datasources>
+          <datasource-dependencies datasource="federated.portfolio">
+            <column caption="Domain Worse Flags" datatype="real" name="[domain_worse_flags]" role="measure" type="quantitative" aggregation="Sum" />
+            <column-instance column="[domain_worse_flags]" derivation="Sum" name="[sum:domain_worse_flags:qk]" pivot="key" type="quantitative" />
+            <column caption="Priority Tier" datatype="string" name="[priority_tier]" role="dimension" type="nominal" />
+            <column-instance column="[priority_tier]" derivation="None" name="[none:priority_tier:nk]" pivot="key" type="nominal" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+            <encodings>
+              <color column="[federated.portfolio].[none:priority_tier:nk]" />
+              <text column="[federated.portfolio].[sum:domain_worse_flags:qk]" />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.portfolio].[none:priority_tier:nk]</rows>
+        <cols>[federated.portfolio].[sum:domain_worse_flags:qk]</cols>
+      </table>
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard name="Hospital Quality &amp; Patient Safety">
+      <size maxheight="800" maxwidth="1200" minheight="800" minwidth="1200" />
+      <zones>
+        <zone h="100000" id="1" type="layout-basic" w="100000" x="0" y="0">
+          <zone h="7000" id="2" type="title" w="100000" x="0" y="0" />
+          <zone h="6000" id="3" type="text" w="100000" x="0" y="7000">
+            <formatted-text>
+              <run fontcolor="#52606D" fontsize="10">CMS Care Compare | 5,432 hospitals | Ratings, domain risk flags, and transparent review prioritization</run>
+            </formatted-text>
+          </zone>
+          <zone h="39000" id="10" name="Rating by State" show-title="true" w="50000" x="0" y="13000" />
+          <zone h="39000" id="11" name="Priority Mix" show-title="true" w="50000" x="50000" y="13000" />
+          <zone h="48000" id="12" name="Rating Distribution" show-title="true" w="50000" x="0" y="52000" />
+          <zone h="48000" id="13" name="Risk Domain Summary" show-title="true" w="50000" x="50000" y="52000" />
+        </zone>
+      </zones>
+    </dashboard>
+  </dashboards>
+  <windows source-height="40">
+    <window class="dashboard" maximized="true" name="Hospital Quality &amp; Patient Safety">
+      <viewpoints>
+        <viewpoint name="Rating by State">
+          <zoom type="entire-view" />
+        </viewpoint>
+        <viewpoint name="Priority Mix">
+          <zoom type="entire-view" />
+        </viewpoint>
+        <viewpoint name="Rating Distribution">
+          <zoom type="entire-view" />
+        </viewpoint>
+        <viewpoint name="Risk Domain Summary">
+          <zoom type="entire-view" />
+        </viewpoint>
+      </viewpoints>
+      <active id="-1" />
+    </window>
+  </windows>
+  <thumbnails />
+</workbook>

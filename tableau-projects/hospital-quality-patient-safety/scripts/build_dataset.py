@@ -112,6 +112,10 @@ def main() -> None:
     hospital.loc[rating.le(2) & flags.ge(2), "priority_tier"] = "High priority"
     hospital.loc[rating.isna(), "priority_tier"] = "Not rated"
     hospital["four_five_star_flag"] = rating.ge(4).astype(int)
+    hospital["rating_label"] = rating.map({
+        1.0: "1 Star", 2.0: "2 Stars", 3.0: "3 Stars",
+        4.0: "4 Stars", 5.0: "5 Stars",
+    }).fillna("Not Rated")
     hospital["source_retrieved_utc"] = retrieved.isoformat()
 
     output = PROCESSED / "hospital_quality_tableau.csv"

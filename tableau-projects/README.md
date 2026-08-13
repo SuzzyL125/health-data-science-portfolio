@@ -32,7 +32,13 @@ The scripts retrieve current public data, preserve raw downloads, validate key f
 
 ## Tableau files
 
-The `tableau/` folder in each project contains the dashboard specification and calculated-field definitions. After the generated CSV is connected in Tableau Desktop, follow the build guide to create and publish the workbook to Tableau Public. Workbook files are intentionally not presented as finished until the official data have been refreshed and the dashboards have passed visual QA.
+The `tableau/` folder in each project contains an editable `.twb` workbook, dashboard specification, and calculated-field definitions. Run the data pipeline first, then open the workbook in Tableau Desktop. The CSV connection is relative, so the repository can be moved without editing an absolute local path.
+
+Regenerate both workbook templates with:
+
+```bash
+python scripts/build_workbooks.py
+```
 
 ## Data publishing policy
 

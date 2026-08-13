@@ -1,0 +1,252 @@
+<?xml version='1.0' encoding='utf-8'?>
+<workbook locale="en_US" source-platform="mac" version="18.1" source-build="2026.2.0 (20262.26.0710.0000)">
+  <preferences />
+  <style-theme name="smooth" />
+  <datasources>
+    <datasource caption="CDC PLACES County Health" inline="true" name="federated.portfolio" version="18.1">
+      <connection class="federated">
+        <named-connections>
+          <named-connection caption="CDC PLACES County Health" name="csv.connection">
+            <connection class="textscan" directory="../data/processed" filename="community_health_tableau.csv" header="yes" separator="," text-qualifier="&amp;quot;" character-set="UTF-8" />
+          </named-connection>
+        </named-connections>
+        <relation connection="csv.connection" name="community_health_tableau#csv" table="[community_health_tableau#csv]" type="table">
+          <columns character-set="UTF-8" header="yes" locale="en_US" separator="," text-qualifier="&amp;quot;">
+            <column datatype="string" name="locationid" ordinal="0" />
+            <column datatype="string" name="locationname" ordinal="1" />
+            <column datatype="string" name="stateabbr" ordinal="2" />
+            <column datatype="string" name="statedesc" ordinal="3" />
+            <column datatype="real" name="totalpopulation" ordinal="4" />
+            <column datatype="real" name="DIABETES" ordinal="5" />
+            <column datatype="real" name="OBESITY" ordinal="6" />
+            <column datatype="real" name="ACCESS2" ordinal="7" />
+            <column datatype="real" name="CHECKUP" ordinal="8" />
+            <column datatype="real" name="burden_score" ordinal="9" />
+            <column datatype="real" name="access_barrier_score" ordinal="10" />
+            <column datatype="real" name="social_needs_score" ordinal="11" />
+            <column datatype="real" name="priority_score" ordinal="12" />
+            <column datatype="real" name="priority_percentile" ordinal="13" />
+            <column datatype="string" name="priority_quintile" ordinal="14" />
+            <column datatype="real" name="high_priority_flag" ordinal="15" />
+          </columns>
+        </relation>
+      </connection>
+      <column caption="Locationid" datatype="string" name="[locationid]" role="dimension" type="nominal" />
+      <column caption="Locationname" datatype="string" name="[locationname]" role="dimension" type="nominal" />
+      <column caption="Stateabbr" datatype="string" name="[stateabbr]" role="dimension" type="nominal" />
+      <column caption="Statedesc" datatype="string" name="[statedesc]" role="dimension" type="nominal" />
+      <column caption="Totalpopulation" datatype="real" name="[totalpopulation]" role="measure" type="quantitative" />
+      <column caption="Diabetes" datatype="real" name="[DIABETES]" role="measure" type="quantitative" />
+      <column caption="Obesity" datatype="real" name="[OBESITY]" role="measure" type="quantitative" />
+      <column caption="Access2" datatype="real" name="[ACCESS2]" role="measure" type="quantitative" />
+      <column caption="Checkup" datatype="real" name="[CHECKUP]" role="measure" type="quantitative" />
+      <column caption="Burden Score" datatype="real" name="[burden_score]" role="measure" type="quantitative" />
+      <column caption="Access Barrier Score" datatype="real" name="[access_barrier_score]" role="measure" type="quantitative" />
+      <column caption="Social Needs Score" datatype="real" name="[social_needs_score]" role="measure" type="quantitative" />
+      <column caption="Priority Score" datatype="real" name="[priority_score]" role="measure" type="quantitative" />
+      <column caption="Priority Percentile" datatype="real" name="[priority_percentile]" role="measure" type="quantitative" />
+      <column caption="Priority Quintile" datatype="string" name="[priority_quintile]" role="dimension" type="nominal" />
+      <column caption="High Priority Flag" datatype="real" name="[high_priority_flag]" role="measure" type="quantitative" />
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name="State Priority">
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold="true" fontcolor="#203864" fontsize="13">Average Priority Percentile by State</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="CDC PLACES County Health" name="federated.portfolio" />
+          </datasources>
+          <datasource-dependencies datasource="federated.portfolio">
+            <column caption="Statedesc" datatype="string" name="[statedesc]" role="dimension" type="nominal" />
+            <column-instance column="[statedesc]" derivation="None" name="[none:statedesc:nk]" pivot="key" type="nominal" />
+            <column caption="Priority Percentile" datatype="real" name="[priority_percentile]" role="measure" type="quantitative" aggregation="Avg" />
+            <column-instance column="[priority_percentile]" derivation="Avg" name="[avg:priority_percentile:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+            <encodings>
+              <color column="[federated.portfolio].[avg:priority_percentile:qk]" />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.portfolio].[none:statedesc:nk]</rows>
+        <cols>[federated.portfolio].[avg:priority_percentile:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Burden vs Access">
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold="true" fontcolor="#203864" fontsize="13">Disease Burden vs Access Barriers</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="CDC PLACES County Health" name="federated.portfolio" />
+          </datasources>
+          <datasource-dependencies datasource="federated.portfolio">
+            <column caption="Stateabbr" datatype="string" name="[stateabbr]" role="dimension" type="nominal" />
+            <column-instance column="[stateabbr]" derivation="None" name="[none:stateabbr:nk]" pivot="key" type="nominal" />
+            <column caption="Priority Quintile" datatype="string" name="[priority_quintile]" role="dimension" type="nominal" />
+            <column-instance column="[priority_quintile]" derivation="None" name="[none:priority_quintile:nk]" pivot="key" type="nominal" />
+            <column caption="Locationname" datatype="string" name="[locationname]" role="dimension" type="nominal" />
+            <column-instance column="[locationname]" derivation="None" name="[none:locationname:nk]" pivot="key" type="nominal" />
+            <column caption="Burden Score" datatype="real" name="[burden_score]" role="measure" type="quantitative" aggregation="Avg" />
+            <column-instance column="[burden_score]" derivation="Avg" name="[avg:burden_score:qk]" pivot="key" type="quantitative" />
+            <column caption="Access Barrier Score" datatype="real" name="[access_barrier_score]" role="measure" type="quantitative" aggregation="Avg" />
+            <column-instance column="[access_barrier_score]" derivation="Avg" name="[avg:access_barrier_score:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Circle" />
+            <encodings>
+              <color column="[federated.portfolio].[none:priority_quintile:nk]" />
+              <lod column="[federated.portfolio].[none:locationname:nk]" />
+              <lod column="[federated.portfolio].[none:stateabbr:nk]" />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.portfolio].[avg:burden_score:qk]</rows>
+        <cols>[federated.portfolio].[avg:access_barrier_score:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Priority Quintiles">
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold="true" fontcolor="#203864" fontsize="13">Counties by Priority Quintile</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="CDC PLACES County Health" name="federated.portfolio" />
+          </datasources>
+          <datasource-dependencies datasource="federated.portfolio">
+            <column caption="Locationid" datatype="string" name="[locationid]" role="dimension" type="nominal" />
+            <column-instance column="[locationid]" derivation="Count" name="[count:locationid:nk]" pivot="key" type="nominal" />
+            <column caption="Priority Quintile" datatype="string" name="[priority_quintile]" role="dimension" type="nominal" />
+            <column-instance column="[priority_quintile]" derivation="None" name="[none:priority_quintile:nk]" pivot="key" type="nominal" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+            <encodings>
+              <color column="[federated.portfolio].[none:priority_quintile:nk]" />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.portfolio].[none:priority_quintile:nk]</rows>
+        <cols>[federated.portfolio].[count:locationid:nk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Diabetes by State">
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold="true" fontcolor="#203864" fontsize="13">Average Diabetes Prevalence by State</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="CDC PLACES County Health" name="federated.portfolio" />
+          </datasources>
+          <datasource-dependencies datasource="federated.portfolio">
+            <column caption="Statedesc" datatype="string" name="[statedesc]" role="dimension" type="nominal" />
+            <column-instance column="[statedesc]" derivation="None" name="[none:statedesc:nk]" pivot="key" type="nominal" />
+            <column caption="Diabetes" datatype="real" name="[DIABETES]" role="measure" type="quantitative" aggregation="Avg" />
+            <column-instance column="[DIABETES]" derivation="Avg" name="[avg:DIABETES:qk]" pivot="key" type="quantitative" />
+            <column caption="Priority Percentile" datatype="real" name="[priority_percentile]" role="measure" type="quantitative" aggregation="Avg" />
+            <column-instance column="[priority_percentile]" derivation="Avg" name="[avg:priority_percentile:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+            <encodings>
+              <color column="[federated.portfolio].[avg:priority_percentile:qk]" />
+              <text column="[federated.portfolio].[avg:DIABETES:qk]" />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.portfolio].[none:statedesc:nk]</rows>
+        <cols>[federated.portfolio].[avg:DIABETES:qk]</cols>
+      </table>
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard name="Community Health Disparities &amp; Access">
+      <size maxheight="800" maxwidth="1200" minheight="800" minwidth="1200" />
+      <zones>
+        <zone h="100000" id="1" type="layout-basic" w="100000" x="0" y="0">
+          <zone h="7000" id="2" type="title" w="100000" x="0" y="0" />
+          <zone h="6000" id="3" type="text" w="100000" x="0" y="7000">
+            <formatted-text>
+              <run fontcolor="#52606D" fontsize="10">CDC PLACES | 2,957 counties | Disease burden, access barriers, social needs, and outreach prioritization</run>
+            </formatted-text>
+          </zone>
+          <zone h="39000" id="10" name="State Priority" show-title="true" w="50000" x="0" y="13000" />
+          <zone h="39000" id="11" name="Burden vs Access" show-title="true" w="50000" x="50000" y="13000" />
+          <zone h="48000" id="12" name="Priority Quintiles" show-title="true" w="50000" x="0" y="52000" />
+          <zone h="48000" id="13" name="Diabetes by State" show-title="true" w="50000" x="50000" y="52000" />
+        </zone>
+      </zones>
+    </dashboard>
+  </dashboards>
+  <windows source-height="40">
+    <window class="dashboard" maximized="true" name="Community Health Disparities &amp; Access">
+      <viewpoints>
+        <viewpoint name="State Priority">
+          <zoom type="entire-view" />
+        </viewpoint>
+        <viewpoint name="Burden vs Access">
+          <zoom type="entire-view" />
+        </viewpoint>
+        <viewpoint name="Priority Quintiles">
+          <zoom type="entire-view" />
+        </viewpoint>
+        <viewpoint name="Diabetes by State">
+          <zoom type="entire-view" />
+        </viewpoint>
+      </viewpoints>
+      <active id="-1" />
+    </window>
+  </windows>
+  <thumbnails />
+</workbook>

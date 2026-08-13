@@ -26,6 +26,8 @@ CDC PLACES: Local Data for Better Health, County Data, 2025 release (`swc5-untb`
 
 The pipeline uses age-adjusted prevalence when available and creates domain percentiles. A composite priority score is the average of available adverse-direction percentile ranks; it is an operational screening index, not a validated clinical or causal score.
 
+In the retrieved 2025 county release, `DELAYMED` and `ISOLATION` were not present. The pipeline records the indicators actually available in `qa_summary.json` and computes scores only from observed measures; it does not impute or invent these fields.
+
 ## Dashboard pages
 
 ### 1. National Equity Overview
@@ -54,3 +56,5 @@ Generated files:
 - `data/processed/qa_summary.json`
 
 Then follow [the Tableau build guide](tableau/BUILD_GUIDE.md).
+
+Or open `tableau/community-health-disparities.twb` directly in Tableau Desktop. It is connected to the processed CSV with a relative path and includes an editable executive dashboard with four views.
